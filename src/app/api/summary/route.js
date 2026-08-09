@@ -1,22 +1,11 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getEvents } from '@/lib/dataStore';
 
 export async function GET() {
   try {
-    const topEvents = await prisma.event.findMany({
-      where: {
-        priority: { in: ['CRITICAL', 'HIGH'] }
-      },
-      orderBy: [
-        { importanceScore: 'desc' },
-        { lastUpdatedAt: 'desc' }
-      ],
-      take: 5
-    });
+    const topEvents = await getEvents({ priority: 'Top', limit: 5 });
 
-    const totalCount = await prisma.event.count();
-
-    const bullets = topEvents.map(e => ({
+    const bullets = topEvents.slice(0, 5).map(e => ({
       id: e.id,
       title: e.canonicalTitle,
       summary: e.summary,
@@ -27,10 +16,10 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      totalEvents: totalCount,
+      totalEvents: topEvents.length,
       count: bullets.length,
       overviewMessage: bullets.length > 0 
-        ? `Since your last update, ${totalCount} significant AI events were detected.` 
+        ? `Since your last update, ${topEvents.length} significant AI events were detected.` 
         : "Nothing major happened in the monitored sources.",
       bullets
     });
