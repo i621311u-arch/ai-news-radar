@@ -1,9 +1,6 @@
 [build]
-  command = "npx prisma db push && node src/lib/seed.js && node src/lib/seedSampleEvents.js && npx prisma generate && npm run build"
+  command = "npm run build"
   publish = ".next"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
 
 # Scheduled Function 1: Ingest RSS feeds every 15 minutes on Netlify
 [functions."scheduled-fetch"]
