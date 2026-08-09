@@ -1,5 +1,3 @@
-import { prisma } from './db.js';
-
 const FALLBACK_EVENTS = [
   {
     id: "ev-o3-release",
@@ -98,8 +96,9 @@ const FALLBACK_EVENTS = [
 ];
 
 export async function getEvents(filters = {}) {
-  if (prisma) {
-    try {
+  try {
+    const { prisma } = await import('./db.js');
+    if (prisma) {
       const { category, priority, status, q, limit = 50 } = filters;
       const where = {};
 
@@ -136,12 +135,12 @@ export async function getEvents(filters = {}) {
       if (events && events.length > 0) {
         return events;
       }
-    } catch (err) {
-      console.warn('[DataStore] Database query failed, using resilient fallbacks:', err.message);
     }
+  } catch (err) {
+    console.warn('[DataStore] Database dynamic load skipped:', err.message);
   }
 
-  // Fallback for Netlify / Serverless functions
+  // Resilient Fallback for Netlify Lambda Serverless
   let filtered = [...FALLBACK_EVENTS];
 
   if (filters.category && filters.category !== 'All') {
