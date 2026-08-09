@@ -1,0 +1,178 @@
+[
+  {
+    "name": "OpenAI News",
+    "url": "https://openai.com/news/",
+    "rssUrl": "https://openai.com/news/rss.xml",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 100,
+    "pollingInterval": 5,
+    "priority": 100,
+    "enabled": true
+  },
+  {
+    "name": "Google DeepMind Blog",
+    "url": "https://deepmind.google/blog/",
+    "rssUrl": "https://deepmind.google/blog/rss.xml",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 100,
+    "pollingInterval": 5,
+    "priority": 100,
+    "enabled": true
+  },
+  {
+    "name": "Hugging Face Blog",
+    "url": "https://huggingface.co/blog",
+    "rssUrl": "https://huggingface.co/blog/feed.xml",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 95,
+    "pollingInterval": 5,
+    "priority": 95,
+    "enabled": true
+  },
+  {
+    "name": "arXiv cs.AI (Artificial Intelligence)",
+    "url": "https://arxiv.org/list/cs.AI/recent",
+    "rssUrl": "https://rss.arxiv.org/rss/cs.AI",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 90,
+    "pollingInterval": 15,
+    "priority": 90,
+    "enabled": true
+  },
+  {
+    "name": "arXiv cs.LG (Machine Learning)",
+    "url": "https://arxiv.org/list/cs.LG/recent",
+    "rssUrl": "http://export.arxiv.org/rss/cs.LG",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 90,
+    "pollingInterval": 15,
+    "priority": 90,
+    "enabled": true
+  },
+  {
+    "name": "Anthropic News",
+    "url": "https://www.anthropic.com/news",
+    "rssUrl": "https://www.anthropic.com/news/rss.xml",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 100,
+    "pollingInterval": 5,
+    "priority": 100,
+    "enabled": true
+  },
+  {
+    "name": "Meta AI Blog",
+    "url": "https://ai.meta.com/blog/",
+    "rssUrl": "https://ai.meta.com/blog/rss/",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 95,
+    "pollingInterval": 10,
+    "priority": 95,
+    "enabled": true
+  },
+  {
+    "name": "Google Research Blog",
+    "url": "https://research.google/",
+    "rssUrl": "https://research.google/blog/rss/",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 95,
+    "pollingInterval": 10,
+    "priority": 95,
+    "enabled": true
+  },
+  {
+    "name": "NVIDIA Research",
+    "url": "https://research.nvidia.com/",
+    "rssUrl": "https://blogs.nvidia.com/feed/",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 95,
+    "pollingInterval": 10,
+    "priority": 95,
+    "enabled": true
+  },
+  {
+    "name": "Microsoft Research",
+    "url": "https://www.microsoft.com/en-us/research/",
+    "rssUrl": "https://www.microsoft.com/en-us/research/feed/",
+    "type": "primary",
+    "credibilityTier": 1,
+    "reliabilityScore": 90,
+    "pollingInterval": 10,
+    "priority": 90,
+    "enabled": true
+  },
+  {
+    "name": "TechCrunch AI",
+    "url": "https://techcrunch.com/category/artificial-intelligence/",
+    "rssUrl": "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "type": "secondary",
+    "credibilityTier": 2,
+    "reliabilityScore": 85,
+    "pollingInterval": 10,
+    "priority": 80,
+    "enabled": true
+  },
+  {
+    "name": "MIT Technology Review",
+    "url": "https://www.technologyreview.com/",
+    "rssUrl": "https://www.technologyreview.com/feed/",
+    "type": "secondary",
+    "credibilityTier": 2,
+    "reliabilityScore": 90,
+    "pollingInterval": 10,
+    "priority": 85,
+    "enabled": true
+  },
+  {
+    "name": "The Verge AI",
+    "url": "https://www.theverge.com/ai-artificial-intelligence",
+    "rssUrl": "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
+    "type": "secondary",
+    "credibilityTier": 2,
+    "reliabilityScore": 82,
+    "pollingInterval": 10,
+    "priority": 80,
+    "enabled": true
+  },
+  {
+    "name": "VentureBeat AI",
+    "url": "https://venturebeat.com/category/ai/",
+    "rssUrl": "https://venturebeat.com/category/ai/feed/",
+    "type": "secondary",
+    "credibilityTier": 2,
+    "reliabilityScore": 78,
+    "pollingInterval": 10,
+    "priority": 75,
+    "enabled": true
+  },
+  {
+    "name": "Hacker News AI",
+    "url": "https://news.ycombinator.com/",
+    "rssUrl": "https://news.ycombinator.com/rss",
+    "type": "community",
+    "credibilityTier": 3,
+    "reliabilityScore": 60,
+    "pollingInterval": 15,
+    "priority": 50,
+    "enabled": true
+  },
+  {
+    "name": "Ars Technica AI",
+    "url": "https://arstechnica.com/tag/ai/",
+    "rssUrl": "https://arstechnica.com/tag/ai/feed/",
+    "type": "secondary",
+    "credibilityTier": 2,
+    "reliabilityScore": 85,
+    "pollingInterval": 15,
+    "priority": 80,
+    "enabled": true
+  }
+]

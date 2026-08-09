@@ -1,0 +1,33 @@
+{
+  "name": "ai-news-radar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "node tests/radar.test.js",
+    "seed": "node src/lib/seed.js",
+    "worker": "node worker.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.16.0",
+    "@prisma/adapter-better-sqlite3": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "better-sqlite3": "^13.0.3",
+    "lucide-react": "^1.31.0",
+    "next": "16.3.0",
+    "node-cron": "^4.6.0",
+    "nodemailer": "^9.0.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "eslint-config-next": "16.3.0",
+    "prisma": "^7.9.1"
+  }
+}

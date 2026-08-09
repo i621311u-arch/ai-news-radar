@@ -1,0 +1,17 @@
+[build]
+  command = "npx prisma generate && npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Scheduled Function 1: Ingest RSS feeds every 15 minutes on Netlify
+[functions."scheduled-fetch"]
+  schedule = "*/15 * * * *"
+
+# Scheduled Function 2: Send Daily Briefing Email at 07:00 AM Asia/Kolkata (01:30 UTC)
+[functions."scheduled-email"]
+  schedule = "30 1 * * *"
+
+[build.environment]
+  NODE_VERSION = "20"
