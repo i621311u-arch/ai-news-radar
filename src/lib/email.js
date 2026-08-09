@@ -10,18 +10,21 @@ export function createTransporter() {
     return null;
   }
 
+  // Gmail SMTP optimization
   if (host.includes('gmail')) {
     return nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
+      service: 'gmail',
       auth: {
         user: user,
         pass: pass
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     });
   }
 
+  // General SMTP (Brevo, Hostinger, SendGrid, etc.)
   return nodemailer.createTransport({
     host: host,
     port: parseInt(process.env.SMTP_PORT || '587'),
@@ -29,6 +32,9 @@ export function createTransporter() {
     auth: {
       user: user,
       pass: pass
+    },
+    tls: {
+      rejectUnauthorized: false
     }
   });
 }
@@ -120,7 +126,7 @@ export function generateDigestContent(topEvents, researchEvents, openSourceEvent
     ` : ''}
 
     <div style="text-align: center; margin-top: 28px;">
-      <a href="http://localhost:3000" class="btn">Read Full Dashboard →</a>
+      <a href="https://ubiquitous-dodol-ec4889.netlify.app" class="btn">Read Full Dashboard →</a>
     </div>
 
     <div class="footer">
@@ -140,73 +146,29 @@ export function generateDigestContent(topEvents, researchEvents, openSourceEvent
 export async function sendDailyDigest(force = false) {
   const todayStr = new Date().toISOString().split('T')[0];
 
-  // Check if digest already sent today
-  const existing = await prisma.dailyDigest.findUnique({
-    where: { digestDate: todayStr }
-  });
-
-  if (existing && existing.status === 'SENT' && !force) {
-    console.log(`[Email] Daily digest for ${todayStr} already sent.`);
-    return { success: true, message: 'Already sent today' };
+  if (prisma) {
+    try {
+      const existing = await prisma.dailyDigest.findUnique({
+        where: { digestDate: todayStr }
+      });
+      if (existing && existing.status === 'SENT' && !force) {
+        return { success: true, message: 'Already sent today' };
+      }
+    } catch (e) {
+      console.warn('[Digest] DailyDigest table query skipped');
+    }
   }
 
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
-  // Fetch top events from last 24 hours
-  const topEvents = await prisma.event.findMany({
-    where: {
-      lastUpdatedAt: { gte: twentyFourHoursAgo },
-      priority: { in: ['CRITICAL', 'HIGH'] }
-    },
-    include: {
-      eventArticles: {
-        include: {
-          article: {
-            include: { source: true }
-          }
-        }
-      }
-    },
-    orderBy: { importanceScore: 'desc' },
-    take: 15
-  });
-
-  const researchEvents = await prisma.event.findMany({
-    where: {
-      lastUpdatedAt: { gte: twentyFourHoursAgo },
-      category: 'Research'
-    },
-    take: 5
-  });
-
-  const openSourceEvents = await prisma.event.findMany({
-    where: {
-      lastUpdatedAt: { gte: twentyFourHoursAgo },
-      category: 'Open Source'
-    },
-    take: 5
-  });
+  const { getEvents } = await import('./dataStore.js');
+  const topEvents = await getEvents({ priority: 'Top', limit: 15 });
+  const researchEvents = await getEvents({ category: 'Research', limit: 5 });
+  const openSourceEvents = await getEvents({ category: 'Open Source', limit: 5 });
 
   const htmlContent = generateDigestContent(topEvents, researchEvents, openSourceEvents, todayStr);
-
   const transporter = createTransporter();
 
   if (!transporter) {
-    console.warn('[Email] SMTP configuration missing. Saving digest JSON to database without sending email.');
-    await prisma.dailyDigest.upsert({
-      where: { digestDate: todayStr },
-      update: {
-        contentJson: JSON.stringify({ topEvents, researchEvents, openSourceEvents }),
-        status: 'PENDING'
-      },
-      create: {
-        digestDate: todayStr,
-        contentJson: JSON.stringify({ topEvents, researchEvents, openSourceEvents }),
-        status: 'PENDING'
-      }
-    });
-
-    return { success: false, error: 'SMTP credentials missing. Digest saved as PENDING.' };
+    return { success: false, error: 'SMTP configuration missing in Environment Variables.' };
   }
 
   try {
@@ -222,36 +184,21 @@ export async function sendDailyDigest(force = false) {
 
     await transporter.sendMail(mailOptions);
 
-    await prisma.dailyDigest.upsert({
-      where: { digestDate: todayStr },
-      update: {
-        contentJson: JSON.stringify({ topEvents, researchEvents, openSourceEvents }),
-        sentAt: new Date(),
-        status: 'SENT'
-      },
-      create: {
-        digestDate: todayStr,
-        contentJson: JSON.stringify({ topEvents, researchEvents, openSourceEvents }),
-        sentAt: new Date(),
-        status: 'SENT'
+    if (prisma) {
+      try {
+        await prisma.dailyDigest.upsert({
+          where: { digestDate: todayStr },
+          update: { sentAt: new Date(), status: 'SENT' },
+          create: { digestDate: todayStr, contentJson: JSON.stringify({ topEvents }), sentAt: new Date(), status: 'SENT' }
+        });
+      } catch (e) {
+        console.warn('[Digest] Upsert skipped');
       }
-    });
+    }
 
-    console.log(`[Email] Daily digest email sent successfully to ${toEmail}`);
     return { success: true, sentTo: toEmail };
   } catch (err) {
     console.error('[Email Error]:', err.message || err);
-
-    await prisma.dailyDigest.upsert({
-      where: { digestDate: todayStr },
-      update: { status: 'FAILED' },
-      create: {
-        digestDate: todayStr,
-        contentJson: JSON.stringify({ topEvents, researchEvents, openSourceEvents }),
-        status: 'FAILED'
-      }
-    });
-
     return { success: false, error: err.message };
   }
 }
