@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getEvents } from '@/lib/dataStore';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const topEvents = await getEvents({ priority: 'Top', limit: 5 });
