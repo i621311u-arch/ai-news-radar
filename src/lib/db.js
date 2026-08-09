@@ -1,19 +1,28 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
 import path from 'path';
 
 const globalForPrisma = globalThis;
 
 function createPrismaClient() {
   let dbRelativePath = process.env.DATABASE_URL
-    ? process.env.DATABASE_URL.replace('file:', '')
-    : './prisma/dev.db';
+    ? process.env.DATABASE_URL
+    : 'file:./prisma/dev.db';
 
-  const dbAbsolutePath = path.isAbsolute(dbRelativePath)
-    ? dbRelativePath
-    : path.resolve(process.cwd(), dbRelativePath);
+  if (!dbRelativePath.startsWith('file:') && !dbRelativePath.startsWith('libsql:')) {
+    dbRelativePath = `file:${dbRelativePath}`;
+  }
 
-  const adapter = new PrismaBetterSqlite3({ url: dbAbsolutePath });
+  // Handle local file path resolution for dev
+  if (dbRelativePath.startsWith('file:')) {
+    const rawPath = dbRelativePath.replace('file:', '');
+    const absolutePath = path.isAbsolute(rawPath)
+      ? rawPath
+      : path.resolve(process.cwd(), rawPath);
+    dbRelativePath = `file:${absolutePath}`;
+  }
+
+  const adapter = new PrismaLibSql({ url: dbRelativePath });
   return new PrismaClient({ adapter });
 }
 
