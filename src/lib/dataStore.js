@@ -1,6 +1,5 @@
 import { prisma } from './db.js';
 
-// Pre-seeded rich fallback events for serverless environments (Netlify)
 const FALLBACK_EVENTS = [
   {
     id: "ev-o3-release",
@@ -99,48 +98,50 @@ const FALLBACK_EVENTS = [
 ];
 
 export async function getEvents(filters = {}) {
-  try {
-    const { category, priority, status, q, limit = 50 } = filters;
-    const where = {};
+  if (prisma) {
+    try {
+      const { category, priority, status, q, limit = 50 } = filters;
+      const where = {};
 
-    if (category && category !== 'All') where.category = category;
-    if (priority && priority !== 'All') {
-      if (priority === 'Top') where.priority = { in: ['CRITICAL', 'HIGH'] };
-      else where.priority = priority;
-    }
-    if (status && status !== 'All') where.verificationStatus = status;
+      if (category && category !== 'All') where.category = category;
+      if (priority && priority !== 'All') {
+        if (priority === 'Top') where.priority = { in: ['CRITICAL', 'HIGH'] };
+        else where.priority = priority;
+      }
+      if (status && status !== 'All') where.verificationStatus = status;
 
-    if (q && q.trim() !== '') {
-      const query = q.trim();
-      where.OR = [
-        { canonicalTitle: { contains: query } },
-        { summary: { contains: query } },
-        { whyItMatters: { contains: query } }
-      ];
-    }
+      if (q && q.trim() !== '') {
+        const query = q.trim();
+        where.OR = [
+          { canonicalTitle: { contains: query } },
+          { summary: { contains: query } },
+          { whyItMatters: { contains: query } }
+        ];
+      }
 
-    const events = await prisma.event.findMany({
-      where,
-      include: {
-        eventArticles: {
-          include: {
-            article: { include: { source: true } }
-          }
+      const events = await prisma.event.findMany({
+        where,
+        include: {
+          eventArticles: {
+            include: {
+              article: { include: { source: true } }
+            }
+          },
+          claims: true
         },
-        claims: true
-      },
-      orderBy: [{ importanceScore: 'desc' }, { lastUpdatedAt: 'desc' }],
-      take: limit
-    });
+        orderBy: [{ importanceScore: 'desc' }, { lastUpdatedAt: 'desc' }],
+        take: limit
+      });
 
-    if (events && events.length > 0) {
-      return events;
+      if (events && events.length > 0) {
+        return events;
+      }
+    } catch (err) {
+      console.warn('[DataStore] Database query failed, using resilient fallbacks:', err.message);
     }
-  } catch (err) {
-    console.warn('[DataStore] Primary database query failed, falling back to memory store:', err.message);
   }
 
-  // Fallback for Serverless / Netlify environment
+  // Fallback for Netlify / Serverless functions
   let filtered = [...FALLBACK_EVENTS];
 
   if (filters.category && filters.category !== 'All') {
