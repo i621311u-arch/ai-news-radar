@@ -3,8 +3,8 @@ import { prisma } from './db.js';
 
 export function createTransporter() {
   const host = process.env.SMTP_HOST;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASSWORD;
+  const user = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
+  const pass = process.env.SMTP_PASSWORD ? process.env.SMTP_PASSWORD.replace(/\s+/g, '').replace(/['"]/g, '') : '';
 
   if (!host || !user || !pass) {
     return null;
@@ -12,7 +12,9 @@ export function createTransporter() {
 
   if (host.includes('gmail')) {
     return nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: user,
         pass: pass
